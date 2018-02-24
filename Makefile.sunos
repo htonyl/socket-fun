@@ -1,0 +1,18 @@
+CC = gcc
+GFLAGS = -lpthread
+CFLAGS = -DDIR_64
+LIB = -lsocket -lnsl
+
+all: server client
+
+%.o: %.c myftp.h
+	${CC} $(CFLAGS) $< -c ${GFLAGS} $(LIB)
+
+server: myftpserver.o myftp.o
+	${CC} $(CFLAGS) -o myftpserver myftpserver.o myftp.o $(GFLAGS) $(LIB)
+
+client: myftpclient.o myftp.o
+	${CC} $(CFLAGS) -o myftpclient myftpclient.o myftp.o $(GFLAGS) $(LIB)
+
+clean:
+	rm *.o

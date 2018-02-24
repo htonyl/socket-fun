@@ -1,0 +1,17 @@
+CC = gcc
+GFLAGS = -lpthread
+LIB = 
+
+all: server client
+
+%.o: %.c myftp.h
+	${CC} $< -c
+
+server: myftpserver.o myftp.o
+	${CC} -o myftpserver  myftpserver.o myftp.o $(GFLAGS)
+
+client: myftpclient.o myftp.o
+	${CC} -o myftpclient myftpclient.o myftp.o $(GFLAGS)
+
+clean:
+	rm *.o
