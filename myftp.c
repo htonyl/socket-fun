@@ -121,7 +121,6 @@ int write_data(char path[], char* buff, int buff_len){
   // Buffers are shared between threads, lock to prevent unwanted write
   pthread_mutex_lock(&WRITE_MUTEX);
   size_t nwritten = fwrite(buff, 1, buff_len, file);
-  free(buff);
   pthread_mutex_unlock(&WRITE_MUTEX);
   
   fclose(file);

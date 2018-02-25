@@ -8,8 +8,14 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <dirent.h>
-#include "myftp.h"
 
+#include <openssl/crypto.h>
+#include <openssl/ssl.h>
+#include <openssl/err.h>
+#include "myftp.h"
+#include "myssl.h"
+
+#define MAX_THREAD_NUM 2048
 #ifdef DIR_64
   #define dirent dirent64
   #define readdir readdir64
@@ -146,12 +152,19 @@ int main(int argc, char** argv){
     }
     _printf(sd, "Server listening on port %d ...\n", PORT);
     
+    SSL* ssl;
+    SSL_CTX* ctx;
+    if(ENABLE_SSL){ 
+      ctx = SSL_create_ctx(); 
+    }
+
     pthread_t thread[MAX_THREAD_NUM];
     threadargs args[MAX_THREAD_NUM];
     int client_sd, t = 0;
     struct sockaddr_in client_addr;
     unsigned int client_addr_len = sizeof(client_addr);
     while((client_sd = accept(sd, (struct sockaddr*)&client_addr, &client_addr_len)) >= 0){
+        if(ENABLE_SSL){ ssl = SSL_respond_handshake(client_sd, ctx); }
         args[t].client_sd = client_sd;
         pthread_create(&thread[t], NULL, handle_thread, &args[t]);
         t++;
