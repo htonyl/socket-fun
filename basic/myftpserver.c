@@ -8,12 +8,7 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <dirent.h>
-
-#include <openssl/crypto.h>
-#include <openssl/ssl.h>
-#include <openssl/err.h>
 #include "myftp.h"
-#include "myssl.h"
 
 #define MAX_THREAD_NUM 2048
 #ifdef DIR_64
@@ -127,8 +122,6 @@ void* handle_thread(void* args){
 
 int main(int argc, char** argv){
     int PORT = atoi(argv[1]);
-    
-    // socket(int family, int type, int protocol);
     int sd = socket(AF_INET, SOCK_STREAM, 0);
     long val = 1;
     if(setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(long)) == -1){
@@ -151,12 +144,6 @@ int main(int argc, char** argv){
         exit(0);
     }
     _printf(sd, "Server listening on port %d ...\n", PORT);
-    
-    SSL* ssl;
-    SSL_CTX* ctx;
-    if(ENABLE_SSL){ 
-      ctx = SSL_create_ctx(); 
-    }
 
     pthread_t thread[MAX_THREAD_NUM];
     threadargs args[MAX_THREAD_NUM];
@@ -164,7 +151,6 @@ int main(int argc, char** argv){
     struct sockaddr_in client_addr;
     unsigned int client_addr_len = sizeof(client_addr);
     while((client_sd = accept(sd, (struct sockaddr*)&client_addr, &client_addr_len)) >= 0){
-        if(ENABLE_SSL){ ssl = SSL_respond_handshake(client_sd, ctx); }
         args[t].client_sd = client_sd;
         pthread_create(&thread[t], NULL, handle_thread, &args[t]);
         t++;

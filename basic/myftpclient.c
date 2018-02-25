@@ -8,12 +8,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <ctype.h>
-
-#include <openssl/crypto.h>
-#include <openssl/ssl.h>
-#include <openssl/err.h>
 #include "myftp.h"
-#include "myssl.h"
 
 int main(int argc, char** argv){
     int sd = socket(AF_INET, SOCK_STREAM, 0);
@@ -27,14 +22,7 @@ int main(int argc, char** argv){
         _printf(sd, "Connection error: %s (Errno:%d)\n", strerror(errno), errno);
         exit(0);
     }
-    
-    SSL* ssl;
-    SSL_CTX* ctx;
-    if(ENABLE_SSL){
-        ctx = SSL_create_ctx();
-        ssl = SSL_request_handshake(sd, ctx);
-    }
-    
+
     _printf(sd, "Connection established with %s:%s -- %s\n", argv[1], argv[2], argv[3]);
     if(strcmp(argv[3], "list") == 0){
         message_s* req_header = create_message(LIST_REQUEST, 10);
