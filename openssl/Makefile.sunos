@@ -1,0 +1,18 @@
+CC = gcc
+GFLAGS = -lpthread
+CFLAGS = -DDIR_64
+LIB = -L/usr/local/lib -lsocket -lnsl -lssl -lcrypto 
+
+all: server client
+
+%.o: %.c myftp.h myssl.h
+	${CC} $(CFLAGS) $< -c ${GFLAGS} $(LIB)
+
+server: myftpserver.o myftp.o myssl.o
+	${CC} $(CFLAGS) -o myftpserver myftpserver.o myftp.o myssl.o $(GFLAGS) $(LIB)
+
+client: myftpclient.o myftp.o myssl.o
+	${CC} $(CFLAGS) -o myftpclient myftpclient.o myftp.o myssl.o $(GFLAGS) $(LIB)
+
+clean:
+	rm *.o

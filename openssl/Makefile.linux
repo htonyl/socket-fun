@@ -1,0 +1,18 @@
+CC = gcc
+GFLAGS = -lpthread
+LIB = -L/usr/local/lib -lssl -lcrypto
+TARGETS= myftp.o myssl.o 
+
+all: server client
+
+%.o: %.c *.h
+	${CC} $< -c
+
+server: myftpserver.o $(TARGETS)
+	${CC} -o myftpserver myftpserver.o $(TARGETS) $(GFLAGS) $(LIB)
+
+client: myftpclient.o $(TARGETS)
+	${CC} -o myftpclient myftpclient.o $(TARGETS) $(GFLAGS) $(LIB)
+
+clean:
+	rm *.o
